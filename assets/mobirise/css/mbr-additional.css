@@ -904,3 +904,31 @@ a {
   padding-bottom: 30px;
   background-color: #232323;
 }
+.cid-slwN0Rz8y0 {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  background-color: #ffffff;
+}
+.cid-slwN0Rz8y0 ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 2.5rem;
+}
+.cid-slwN0Rz8y0 li {
+  position: relative;
+  margin-bottom: 1rem;
+}
+.cid-slwN0Rz8y0 ul li::before {
+  position: absolute;
+  left: -1.6rem;
+  content: "\2022";
+  color: #6592e6;
+  font-weight: bold;
+  font-size: 2rem;
+  width: 1.6rem;
+}
+.cid-slw7FTcDu5 {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  background-color: #232323;
+}
