@@ -1,1 +1,1 @@
-document.getElementById("aids").innerHTML = "E";
+document.getElementById("aids").innerHTML = "AIDS"
