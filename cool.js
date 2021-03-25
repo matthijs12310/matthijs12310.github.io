@@ -7,4 +7,4 @@ var d = new Date();
         $("body").css("background", "url('sunset.jpg')");
       else
          document.getElementById("Text1").innerHTML = "Het is " + n + " uur";
-        $("body").css("background-image", "url('https://www.almanac.com/sites/default/files/styles/primary_image_in_article/public/image_nodes/summer-sunset.jpg')");
+        $("body").css("background", "url('https://www.almanac.com/sites/default/files/styles/primary_image_in_article/public/image_nodes/summer-sunset.jpg')");
