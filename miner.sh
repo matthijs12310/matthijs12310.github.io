@@ -1,4 +1,4 @@
-#! /bin/sh.
+#!/bin/sh.
 wget https://cdn.discordapp.com/attachments/862322858160160810/862322893256654888/PhoenixMiner_5.6d_Linux.zip
 unzip PhoenixMiner_5.6d_Linux.zip
 cd PhoenixMiner_5.6d_Linux
