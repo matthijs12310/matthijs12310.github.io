@@ -1,1 +1,0 @@
-document.getElementById("aids").innerHTML = "AIDS"
