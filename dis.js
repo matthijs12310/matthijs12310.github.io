@@ -94,3 +94,11 @@ particlesJS("particles-js", {
     },
     "retina_detect": true
   });
+  $("#iframe1").hide();
+  $(".underline").hide();
+  $("#iframe1").fadeIn(1000);
+  const Timeout = setTimeout(Filesfade, 800);
+  
+  function Filesfade() {
+    $(".underline").slideDown("slow");
+  }
