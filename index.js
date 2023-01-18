@@ -22,6 +22,11 @@ $(".a").click(function(){
         document.getElementById("buildstatus").innerHTML = "RDP is not running yet"
         return
       }
+      else if (json.build.status == "failed") {
+        if (json.build.status == "failed")
+        document.getElementById("buildstatus").innerHTML = "RDP is not running yet"
+        return
+      }
       else{
         document.getElementById("rdpp").style.display = "none"
       }
@@ -101,7 +106,7 @@ var makeItRain = function() {
     .then((response) => response.json())
     .then((data) => {
       console.log(data.build.status)
-      if (data.build.status == "cancelled") {
+      if ((data.build.status == "cancelled") || (data.build.status == "failed")) {
         document.getElementById("buildstatus").innerHTML = "Starting..."
         var url = "https://ci.appveyor.com/api/builds";
         var xhr = new XMLHttpRequest();
