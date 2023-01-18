@@ -8,6 +8,41 @@ $(".a").click(function(){
     $(".about").fadeOut(300);
     $(".text").delay(300).fadeIn();
   });
+  let url = "https://ci.appveyor.com/api/projects/matthijs12310/fdhsdfh";
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url);
+  xhr.setRequestHeader("Authorization", "Bearer n8j33g8ervqeoaptt4ii");
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      console.log(xhr.status);
+      json = JSON.parse(xhr.responseText)
+      console.log(json)
+      if (json.build.status == "cancelled") {
+        console.log("cancelled");
+        document.getElementById("buildstatus").innerHTML = "RDP is not running yet"
+        return
+      }
+      else{
+        document.getElementById("rdpp").style.display = "none"
+      }
+      let jobId = json.build.jobs[0].jobId
+      console.log(jobId)
+      url = "https://ci.appveyor.com/api/buildjobs/" + jobId + "/log"
+      var client = new XMLHttpRequest();
+client.open('GET', url);
+client.onreadystatechange = function() {
+  let logs = client.responseText.split(" ")
+  let logss = logs[68]
+  console.log(logss)
+  const searchTerm = "["
+  const hoerending = logss.indexOf(searchTerm)
+  logss = logss.slice(0, hoerending)
+  document.getElementById("buildstatus").innerHTML = logss
+}
+client.send();
+
+   }};
+   xhr.send();
 });
 
 var makeItRain = function() {
@@ -54,3 +89,43 @@ var makeItRain = function() {
   });
   
   makeItRain();
+
+
+  function StartBuild() {
+    $(".startbut").hide();
+    fetch('https://ci.appveyor.com/api/projects/matthijs12310/fdhsdfh', {
+      headers: {
+        'Authorization' : 'Bearer n8j33g8ervqeoaptt4ii'
+      }
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data.build.status)
+      if (data.build.status == "cancelled") {
+        document.getElementById("buildstatus").innerHTML = "Starting..."
+        var url = "https://ci.appveyor.com/api/builds";
+        var xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.setRequestHeader("Authorization", "Bearer n8j33g8ervqeoaptt4ii");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+       if (xhr.readyState === 4) {
+          console.log(xhr.status);
+          console.log(xhr.responseText);
+       }};
+    var data = `{
+        "accountName": "matthijs12310",
+        "projectSlug": "fdhsdfh",
+        "branch": "master"
+    }`;
+    xhr.send(data);
+    setTimeout(function(){
+      window.location.reload();
+   }, 22000);
+      }
+      else {
+        $(".startbut").fadeIn(300);
+        return
+      }
+    });
+  }

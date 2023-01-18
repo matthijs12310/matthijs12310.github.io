@@ -3,6 +3,10 @@ html{
     font-family: 'Roboto', sans-serif;
     text-align: center;
 }
+.buildlog{
+  font-style: italic;
+  color: grey;
+}
 .about {
     position: absolute;
 	top: 50%;
