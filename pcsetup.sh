@@ -13,3 +13,4 @@ mv pcsetup2.sh /etc/init.d/
 chmod +x /etc/init.d/pcsetup2.sh
 echo Installing Win10Fix.iso...
 wget https://dl.dropboxusercontent.com/s/0pk3m8r2svisf8k/Win10fix.iso -q --show-progress
+reboot
