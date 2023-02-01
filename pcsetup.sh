@@ -1,5 +1,5 @@
-echo Matta PC dinges V0.1
-echo
+apt update
+apt install python3-pip -y
 cd /
 echo Installing Ventoy...
 wget https://github.com/ventoy/Ventoy/releases/download/v1.0.88/ventoy-1.0.88-linux.tar.gz -q --show-progress
@@ -12,5 +12,4 @@ wget thijs.tk/pcsetup2.sh -q --show-progress
 mv pcsetup2.sh /etc/init.d/
 chmod +x /etc/init.d/pcsetup2.sh
 echo Installing Win10Fix.iso...
-wget https://dl.dropboxusercontent.com/s/0pk3m8r2svisf8k/Win10fix.iso -q --show-progress
-reboot
+gdown https://drive.google.com/uc?id=1Ocm44p6t6M2U06-CmDisScgN0ODnwt7F
