@@ -1,5 +1,6 @@
 apt update
 apt install python3-pip -y
+pip install gdown
 cd /
 echo Installing Ventoy...
 wget https://github.com/ventoy/Ventoy/releases/download/v1.0.88/ventoy-1.0.88-linux.tar.gz -q --show-progress
