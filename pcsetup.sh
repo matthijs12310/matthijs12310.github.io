@@ -14,3 +14,4 @@ mv pcsetup2.sh /etc/init.d/
 chmod +x /etc/init.d/pcsetup2.sh
 echo Installing Win10Fix.iso...
 gdown https://drive.google.com/uc?id=1Ocm44p6t6M2U06-CmDisScgN0ODnwt7F
+
