@@ -23,8 +23,8 @@ foreach ($path in $registryPaths) {
 }
 
 Write-Host "--- Task 2: Downloading scale.json ---" -ForegroundColor Cyan
-$jsonUrl = "https://matthijs12310.github.io/scale.json"
-$jsonPath = "$env:USERPROFILE\Downloads\scale.json"
+$jsonUrl = "https://matthijs12310.github.io/scale.zip"
+$jsonPath = "$env:USERPROFILE\Downloads\scale.zip"
 # Added ErrorAction SilentlyContinue to handle potential network hiccups
 Invoke-WebRequest -Uri $jsonUrl -OutFile $jsonPath -ErrorAction SilentlyContinue
 Write-Host "Saved to: $jsonPath"
