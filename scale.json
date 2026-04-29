@@ -1,0 +1,521 @@
+{
+  "Name": "scale",
+  "CreationDate": "2026-4-29",
+  "Commands": [
+    {
+      "Command": "open",
+      "Target": "https://account.scaleway.com/register",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"_r_1_\"]/span",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"_r_1_\"]/span",
+        "xpath=//div[2]/span",
+        "css=#_r_1_ > span"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"option-0\"]/div/div/span",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"option-0\"]/div/div/span",
+        "xpath=//div[2]/div/div/div/div/div/div/div/span",
+        "css=#option-0 > div > div > span"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"root\"]/div/main/div/div/div/div/div[2]/button[4]",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"root\"]/div/main/div/div/div/div/div[2]/button[4]",
+        "xpath=//button[4]",
+        "css=#root > div > main > div > div > div > div > div.uv_toi52u0.uv_toi52u2d.uv_toi52u3v > button.uv_e1wcoe0.uv_e1wcoe1.uv_e1wcoe3.uv_e1wcoe8.uv_e1wcoee.uv_e1wcoej.uv_e1wcoe19"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "selectWindow",
+      "Target": "tab=open",
+      "Value": "https://www.emailondeck.com/eod.php",
+      "Description": ""
+    },
+    {
+      "Command": "XClick",
+      "Target": "id=yne_input",
+      "Value": "",
+      "Targets": [
+        "xpath=/html/body/div[2]/div/div/div[2]/div/form/div[2]/button",
+        "xpath=//div[2]/button",
+        "css=body > div.section-top-qr > div > div > div.col-xs-12.col-sm-12.col-md-12.col-lg-12.col-xl-6 > div.temp-emailbox > form > div.input-box-col.hidden-xs-sm > button"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "XType",
+      "Target": "${KEY_CTRL+KEY_C}",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "selectWindow",
+      "Target": "title=Register*",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=_r_1c_",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "XType",
+      "Target": "${KEY_CTRL+KEY_V}",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=_r_1g_",
+      "Value": "on",
+      "Targets": [
+        "id=_r_1g_",
+        "name=validateTOS",
+        "xpath=//*[@id=\"_r_1g_\"]",
+        "xpath=//input[@id='_r_1g_']",
+        "xpath=//div[3]/input",
+        "css=#_r_1g_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=_r_1g_",
+      "Value": "",
+      "Targets": [
+        "id=_r_1g_",
+        "name=validateTOS",
+        "xpath=//*[@id=\"_r_1g_\"]",
+        "xpath=//input[@id='_r_1g_']",
+        "xpath=//div[3]/input",
+        "css=#_r_1g_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "selectFrame",
+      "Target": "index=1",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div/div/div/button/div",
+      "Value": "",
+      "Targets": [
+        "xpath=/html/body/div/div/div/button/div",
+        "xpath=//button/div",
+        "css=body > div > div.content > div.left.flex-vcenter > button > div.checkbox.icon.fade-in"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "selectFrame",
+      "Target": "relative=top",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"root\"]/div/main/div/div/div/form/div/div[5]/div/button[2]",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"root\"]/div/main/div/div/div/form/div/div[5]/div/button[2]",
+        "xpath=//button[@type='submit']",
+        "xpath=//button[2]",
+        "css=#root > div > main > div > div > div > form > div > div.uv_toi52u0.uv_toi52u2d.uv_toi52u3p.uv_toi52u61 > div > button.uv_e1wcoe0.uv_e1wcoe1.uv_e1wcoe3.uv_e1wcoe9.uv_e1wcoee.uv_e1wcoei.uv_e1wcoel"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "selectWindow",
+      "Target": "title=*Inbox*",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "storeText",
+      "Target": "xpath=//*[@id=\"email_rows\"]/div/table/tbody/tr/td[3]",
+      "Value": "rawText",
+      "Description": ""
+    },
+    {
+      "Command": "executeScript_Sandbox",
+      "Target": "var match = ${rawText}.match(/\\d{6}/); return match ? match[0] : \"NOT_FOUND\";",
+      "Value": "otpCode",
+      "Description": ""
+    },
+    {
+      "Command": "selectWindow",
+      "Target": "title=Register*",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "XClick",
+      "Target": "id=_r_20_-0",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "XType",
+      "Target": "${otpCode}",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"corporateIndustry\"]/span",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"corporateIndustry\"]/span",
+        "xpath=//div[2]/span",
+        "css=#corporateIndustry > span"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"option-0\"]/div/div/span",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"option-0\"]/div/div/span",
+        "xpath=//div/div/div/div/div/div/div/span",
+        "css=#option-0 > div > div > span"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=companyName",
+      "Value": "",
+      "Targets": [
+        "id=companyName",
+        "name=companyName",
+        "xpath=//*[@id=\"companyName\"]",
+        "xpath=//input[@id='companyName']",
+        "xpath=//input",
+        "css=#companyName"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=companyName",
+      "Value": "henk",
+      "Targets": [
+        "id=companyName",
+        "name=companyName",
+        "xpath=//*[@id=\"companyName\"]",
+        "xpath=//input[@id='companyName']",
+        "xpath=//input",
+        "css=#companyName"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=_r_2p_",
+      "Value": "f",
+      "Targets": [
+        "id=_r_2p_",
+        "name=firstName",
+        "xpath=//*[@id=\"_r_2p_\"]",
+        "xpath=//input[@id='_r_2p_']",
+        "xpath=//div[2]/div/div[2]/input",
+        "css=#_r_2p_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=_r_2p_",
+      "Value": "",
+      "Targets": [
+        "id=_r_2p_",
+        "name=firstName",
+        "xpath=//*[@id=\"_r_2p_\"]",
+        "xpath=//input[@id='_r_2p_']",
+        "xpath=//div[2]/div/div[2]/input",
+        "css=#_r_2p_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=_r_2t_",
+      "Value": "",
+      "Targets": [
+        "id=_r_2t_",
+        "name=lastName",
+        "xpath=//*[@id=\"_r_2t_\"]",
+        "xpath=//input[@id='_r_2t_']",
+        "xpath=//div[2]/div[2]/div[2]/input",
+        "css=#_r_2t_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=_r_2t_",
+      "Value": "f",
+      "Targets": [
+        "id=_r_2t_",
+        "name=lastName",
+        "xpath=//*[@id=\"_r_2t_\"]",
+        "xpath=//input[@id='_r_2t_']",
+        "xpath=//div[2]/div[2]/div[2]/input",
+        "css=#_r_2t_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"root\"]/div/main/div/div/form/div/div[3]/button",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"root\"]/div/main/div/div/form/div/div[3]/button",
+        "xpath=//button[@type='submit']",
+        "xpath=//button",
+        "css=#root > div > main > div > div > form > div > div.uv_toi52u0.uv_toi52u2j.uv_toi52u6d > button"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=_r_7_",
+      "Value": "",
+      "Targets": [
+        "id=_r_7_",
+        "name=streetName1",
+        "xpath=//*[@id=\"_r_7_\"]",
+        "xpath=//input[@id='_r_7_']",
+        "xpath=//input",
+        "css=#_r_7_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=_r_7_",
+      "Value": "henkie 2",
+      "Targets": [
+        "id=_r_7_",
+        "name=streetName1",
+        "xpath=//*[@id=\"_r_7_\"]",
+        "xpath=//input[@id='_r_7_']",
+        "xpath=//input",
+        "css=#_r_7_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=_r_b_",
+      "Value": "",
+      "Targets": [
+        "id=_r_b_",
+        "name=postalCode",
+        "xpath=//*[@id=\"_r_b_\"]",
+        "xpath=//input[@id='_r_b_']",
+        "xpath=//div[2]/div/div/div[2]/input",
+        "css=#_r_b_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=_r_b_",
+      "Value": "5396IJ",
+      "Targets": [
+        "id=_r_b_",
+        "name=postalCode",
+        "xpath=//*[@id=\"_r_b_\"]",
+        "xpath=//input[@id='_r_b_']",
+        "xpath=//div[2]/div/div/div[2]/input",
+        "css=#_r_b_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=_r_f_",
+      "Value": "",
+      "Targets": [
+        "id=_r_f_",
+        "name=city",
+        "xpath=//*[@id=\"_r_f_\"]",
+        "xpath=//input[@id='_r_f_']",
+        "xpath=//div[2]/div/div[2]/input",
+        "css=#_r_f_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=_r_f_",
+      "Value": "Drenthe",
+      "Targets": [
+        "id=_r_f_",
+        "name=city",
+        "xpath=//*[@id=\"_r_f_\"]",
+        "xpath=//input[@id='_r_f_']",
+        "xpath=//div[2]/div/div[2]/input",
+        "css=#_r_f_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"_r_j_\"]/span",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"_r_j_\"]/span",
+        "xpath=//div[2]/span",
+        "css=#_r_j_ > span"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"option-0\"]/div/div/span",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"option-0\"]/div/div/span",
+        "xpath=//div[2]/div/div/div/div/span",
+        "css=#option-0 > div > div > span"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"_r_2v9_\"]/span",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"_r_2v9_\"]/span",
+        "xpath=//div[2]/div/div/div[2]/span",
+        "css=#_r_2v9_ > span"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"option-0\"]/div/div/span",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"option-0\"]/div/div/span",
+        "xpath=//div[2]/div/div/div/div/span",
+        "css=#option-0 > div > div > span"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"app-root\"]/div/div/main/div/div/div[2]/div[2]/div/form/div/div[2]/button",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"app-root\"]/div/div/main/div/div/div[2]/div[2]/div/form/div/div[2]/button",
+        "xpath=//button[@type='submit']",
+        "xpath=//button",
+        "css=#app-root > div > div > main > div > div > div.uv_toi52u0.uv_toi52u2d.uv_toi52u41.uv_toi52u61 > div.uv_toi52u0.uv_toi52u2j.uv_toi52u3p > div > form > div > div.uv_toi52u0.uv_toi52u2j.uv_toi52u3v.uv_toi52u6d > button"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"app-root\"]/div/div/main/div/div/div/div/div/div[2]/button[2]/div/div/div/div/div/div/h3",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"app-root\"]/div/div/main/div/div/div/div/div/div[2]/button[2]/div/div/div/div/div/div/h3",
+        "xpath=//button[2]/div/div/div/div/div/div/h3",
+        "css=#app-root > div > div > main > div > div > div > div > div > div.uv_x6hyh50.uv_x6hyh52p > button:nth-child(2) > div > div > div > div > div > div > h3"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"app-root\"]/div/div/main/div/div/div[2]/div/div/form/div/div[2]/button",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"app-root\"]/div/div/main/div/div/div[2]/div/div/form/div/div[2]/button",
+        "xpath=//button[@type='button']",
+        "xpath=//button",
+        "css=#app-root > div > div > main > div > div > div.uv_toi52u0.uv_toi52u2d.uv_toi52u41.uv_toi52u61 > div > div > form > div > div.uv_toi52u0.uv_toi52u2j.uv_toi52u3v.uv_toi52u6d > button.uv_e1wcoe0.uv_e1wcoe1.uv_e1wcoe3.uv_e1wcoe8.uv_e1wcoee.uv_e1wcoek.uv_e1wcoe10"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=_r_492_",
+      "Value": "henk",
+      "Targets": [
+        "id=_r_492_",
+        "name=name",
+        "xpath=//*[@id=\"_r_492_\"]",
+        "xpath=//input[@id='_r_492_']",
+        "xpath=//input",
+        "css=#_r_492_"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"app-root\"]/div/div/main/section/div/div/form/div/div[5]/div/button",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"app-root\"]/div/div/main/section/div/div/form/div/div[5]/div/button",
+        "xpath=//button[@type='submit']",
+        "xpath=//button",
+        "css=#app-root > div > div > main > section > div > div > form > div > div.css-7qm1jj.eug408s0.uv_toi52u0.uv_toi52up.uv_toi52u2d > div > button"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"app-root\"]/div/div/main/section/div/div/form/div/div[2]/fieldset/div/div/div/div/div/label",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"app-root\"]/div/div/main/section/div/div/form/div/div[2]/fieldset/div/div/div/div/div/label",
+        "xpath=//div/div/div/div/div/label",
+        "css=#app-root > div > div > main > section > div > div > form > div > div:nth-child(2) > fieldset > div > div > div:nth-child(1) > div > div > label"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"app-root\"]/div/div/main/section/div/div/form/div/div[3]/button",
+      "Value": "",
+      "Targets": [
+        "xpath=//*[@id=\"app-root\"]/div/div/main/section/div/div/form/div/div[3]/button",
+        "xpath=//button[@type='submit']",
+        "xpath=//button",
+        "css=#app-root > div > div > main > section > div > div > form > div > div.css-b6dkdo.e1ne8i4a0.uv_toi52u0.uv_toi52u2j.uv_toi52u3v.uv_toi52u6d > button"
+      ],
+      "Description": ""
+    },
+    {
+      "Command": "echo",
+      "Target": "",
+      "Value": "",
+      "Description": ""
+    }
+  ]
+}
