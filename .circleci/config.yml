@@ -26,7 +26,6 @@ jobs:
             # Start Chrome with your macro via URL API
             # Note: Chrome is pre-installed on CircleCI Windows images
             Start-Process "chrome.exe" -ArgumentList "--no-sandbox", "chrome-extension://gcbalfbdmfieckjlnblleoemohcganoc/ui-vision.html?macro=MyMacro&direct=1"
-            Start-Sleep -Seconds 60
 
 # 3. Define the workflow
 workflows:
