@@ -72,7 +72,7 @@
     },
     {
       "Command": "click",
-      "Target": "id=_r_1c_",
+      "Target": "name=email",
       "Value": "",
       "Description": ""
     },
@@ -204,22 +204,8 @@
       "Description": ""
     },
     {
-      "Command": "click",
-      "Target": "id=companyName",
-      "Value": "",
-      "Targets": [
-        "id=companyName",
-        "name=companyName",
-        "xpath=//*[@id=\"companyName\"]",
-        "xpath=//input[@id='companyName']",
-        "xpath=//input",
-        "css=#companyName"
-      ],
-      "Description": ""
-    },
-    {
       "Command": "type",
-      "Target": "id=companyName",
+      "Target": "name=companyName",
       "Value": "henk",
       "Targets": [
         "id=companyName",
@@ -233,7 +219,7 @@
     },
     {
       "Command": "type",
-      "Target": "id=_r_2p_",
+      "Target": "name=firstName",
       "Value": "f",
       "Targets": [
         "id=_r_2p_",
@@ -246,36 +232,8 @@
       "Description": ""
     },
     {
-      "Command": "click",
-      "Target": "id=_r_2p_",
-      "Value": "",
-      "Targets": [
-        "id=_r_2p_",
-        "name=firstName",
-        "xpath=//*[@id=\"_r_2p_\"]",
-        "xpath=//input[@id='_r_2p_']",
-        "xpath=//div[2]/div/div[2]/input",
-        "css=#_r_2p_"
-      ],
-      "Description": ""
-    },
-    {
-      "Command": "click",
-      "Target": "id=_r_2t_",
-      "Value": "",
-      "Targets": [
-        "id=_r_2t_",
-        "name=lastName",
-        "xpath=//*[@id=\"_r_2t_\"]",
-        "xpath=//input[@id='_r_2t_']",
-        "xpath=//div[2]/div[2]/div[2]/input",
-        "css=#_r_2t_"
-      ],
-      "Description": ""
-    },
-    {
       "Command": "type",
-      "Target": "id=_r_2t_",
+      "Target": "name=lastName",
       "Value": "f",
       "Targets": [
         "id=_r_2t_",
@@ -300,22 +258,8 @@
       "Description": ""
     },
     {
-      "Command": "click",
-      "Target": "id=_r_7_",
-      "Value": "",
-      "Targets": [
-        "id=_r_7_",
-        "name=streetName1",
-        "xpath=//*[@id=\"_r_7_\"]",
-        "xpath=//input[@id='_r_7_']",
-        "xpath=//input",
-        "css=#_r_7_"
-      ],
-      "Description": ""
-    },
-    {
       "Command": "type",
-      "Target": "id=_r_7_",
+      "Target": "name=streetName1",
       "Value": "henkie 2",
       "Targets": [
         "id=_r_7_",
@@ -328,22 +272,8 @@
       "Description": ""
     },
     {
-      "Command": "click",
-      "Target": "id=_r_b_",
-      "Value": "",
-      "Targets": [
-        "id=_r_b_",
-        "name=postalCode",
-        "xpath=//*[@id=\"_r_b_\"]",
-        "xpath=//input[@id='_r_b_']",
-        "xpath=//div[2]/div/div/div[2]/input",
-        "css=#_r_b_"
-      ],
-      "Description": ""
-    },
-    {
       "Command": "type",
-      "Target": "id=_r_b_",
+      "Target": "name=postalCode",
       "Value": "5396IJ",
       "Targets": [
         "id=_r_b_",
@@ -356,22 +286,8 @@
       "Description": ""
     },
     {
-      "Command": "click",
-      "Target": "id=_r_f_",
-      "Value": "",
-      "Targets": [
-        "id=_r_f_",
-        "name=city",
-        "xpath=//*[@id=\"_r_f_\"]",
-        "xpath=//input[@id='_r_f_']",
-        "xpath=//div[2]/div/div[2]/input",
-        "css=#_r_f_"
-      ],
-      "Description": ""
-    },
-    {
       "Command": "type",
-      "Target": "id=_r_f_",
+      "Target": "name=city",
       "Value": "Drenthe",
       "Targets": [
         "id=_r_f_",
@@ -407,12 +323,12 @@
     },
     {
       "Command": "click",
-      "Target": "xpath=//*[@id=\"_r_2v9_\"]/span",
+      "Target": "xpath=//*[@id=\"_r_gg_\"]/span",
       "Value": "",
       "Targets": [
-        "xpath=//*[@id=\"_r_2v9_\"]/span",
+        "xpath=//*[@id=\"_r_gg_\"]/span",
         "xpath=//div[2]/div/div/div[2]/span",
-        "css=#_r_2v9_ > span"
+        "css=#_r_gg_ > span"
       ],
       "Description": ""
     },
@@ -464,7 +380,7 @@
     },
     {
       "Command": "type",
-      "Target": "id=_r_492_",
+      "Target": "name=name",
       "Value": "henk",
       "Targets": [
         "id=_r_492_",
