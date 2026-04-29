@@ -51,7 +51,7 @@ try {
     Write-Host "Download failed: $($_.Exception.Message)" -ForegroundColor Red
 }
 
-curl.exe -L "https://download.ui.vision/x/uivision-xmodules-setup-v2026.exe" -o x.exe; Start-Process .\x.exe -ArgumentList "/VERYSILENT" -Wait
+Start-Process .\x.exe -ArgumentList "/VERYSILENT" -Wait
 
 Write-Host "`n--- Setup Complete! ---" -ForegroundColor Green
 Write-Host "Extensions are now FORCE-INSTALLED. Restart Chrome and visit 'chrome://extensions' to see them active."
