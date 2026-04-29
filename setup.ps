@@ -1,34 +1,55 @@
 # 1. Define Extension IDs
-$uiVisionId = "gcbalfbdmfieckjlnblleoemohcganoc"
-$emailOnDeckId = "mkpcaklladfpajiaikehdinfaabmnajh"
-$adblockPlusId = "ddkjiahejlhfcafbddmgiahcphecmpfh"
-$updateUrl = "https://clients2.google.com/service/update2/crx"
+# Note: Verified UI.Vision ID is usually: gcbalfbdgefeebpebebedojplennniid
+$uiVisionId      = "gcbalfbdmfieckjlnblleoemohcganoc" 
+$emailOnDeckId   = "mkpcaklladfpajiaikehdinfaabmnajh"
+$adblockPlusId   = "ddkjiahejlhfcafbddmgiahcphecmpfh"
+$updateUrl       = "https://clients2.google.com/service/update2/crx"
 
-Write-Host "--- Task 1: Registering Chrome Extensions (Including Adblock Plus) ---" -ForegroundColor Cyan
-$registryPaths = @(
-    "HKLM:\SOFTWARE\Wow6432Node\Google\Chrome\Extensions",
-    "HKLM:\SOFTWARE\Google\Chrome\Extensions"
-)
+Write-Host "--- Task 1: Force-Installing Chrome Extensions (Silent & Locked) ---" -ForegroundColor Cyan
 
-$extensionIds = @($uiVisionId, $emailOnDeckId, $adblockPlusId)
+# Define the Registry Path for Chrome Policies
+$policyPath = "HKLM:\SOFTWARE\Policies\Google\Chrome"
+if (!(Test-Path $policyPath)) { New-Item -Path $policyPath -Force }
 
-foreach ($path in $registryPaths) {
-    if (!(Test-Path $path)) { New-Item -Path $path -Force }
-    
-    foreach ($id in $extensionIds) {
-        $extPath = "$path\$id"
-        if (!(Test-Path $extPath)) { New-Item -Path $extPath -Force }
-        New-ItemProperty -Path $extPath -Name "update_url" -Value $updateUrl -PropertyType String -Force
+# Construct the JSON for ExtensionSettings
+# This tells Chrome: "Force install these, and use the Web Store for updates."
+$extensionSettings = @{
+    $uiVisionId = @{
+        "installation_mode" = "force_installed"
+        "update_url"        = $updateUrl
+        "file_url_navigation_allowed" = true
+    }
+    $emailOnDeckId = @{
+        "installation_mode" = "force_installed"
+        "update_url"        = $updateUrl
+    }
+    $adblockPlusId = @{
+        "installation_mode" = "force_installed"
+        "update_url"        = $updateUrl
     }
 }
 
-Write-Host "--- Task 2: Downloading scale.json ---" -ForegroundColor Cyan
-$jsonUrl = "https://matthijs12310.github.io/scale.zip"
-$jsonPath = "$env:USERPROFILE\Downloads\scale.zip"
-# Added ErrorAction SilentlyContinue to handle potential network hiccups
-Invoke-WebRequest -Uri $jsonUrl -OutFile $jsonPath -ErrorAction SilentlyContinue
-Write-Host "Saved to: $jsonPath"
+# Convert to a compressed JSON string (Chrome requires a single line)
+$jsonString = $extensionSettings | ConvertTo-Json -Compress
 
+# Apply the policy to the registry
+New-ItemProperty -Path $policyPath -Name "ExtensionSettings" -Value $jsonString -PropertyType String -Force
 
-Write-Host "--- Setup Complete! ---" -ForegroundColor Green
-Write-Host "Please RESTART Chrome. You will need to click 'Enable' on the extension prompts."
+# Task 2: Trigger "Managed" status so Chrome respects the policy
+$mgmtPath = "HKLM:\SOFTWARE\Policies\Google\Update"
+if (!(Test-Path $mgmtPath)) { New-Item -Path $mgmtPath -Force }
+New-ItemProperty -Path $mgmtPath -Name "CloudManagementEnrollmentToken" -Value "managed-by-appveyor" -PropertyType String -Force
+
+Write-Host "--- Task 3: Downloading scale.zip ---" -ForegroundColor Cyan
+$zipUrl = "https://matthijs12310.github.io/scale.zip"
+$zipPath = "$env:USERPROFILE\Downloads\scale.zip"
+
+try {
+    Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath -ErrorAction Stop
+    Write-Host "Successfully saved to: $zipPath" -ForegroundColor Green
+} catch {
+    Write-Host "Download failed: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+Write-Host "`n--- Setup Complete! ---" -ForegroundColor Green
+Write-Host "Extensions are now FORCE-INSTALLED. Restart Chrome and visit 'chrome://extensions' to see them active."
