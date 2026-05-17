@@ -1,36 +1,64 @@
-name: machine.dev quickstart
+name: machine.dev SSH shell
+
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
-      debug_enabled:
-        type: boolean
-        description: 'Enable SSH debug session'
-        required: false
-        default: false
+      keepalive_minutes:
+        description: "How long to keep the runner alive"
+        required: true
+        default: "120"
 
 jobs:
-  hello-gpu:
-    runs-on: [machine, gpu=t4g, tenancy=spot]
-    timeout-minutes: 360  # raise this freely for long training runs
+  ssh:
+    runs-on:
+      - machine
+      - gpu=t4
+      - regions=eu-south-2
+      - tenancy=spot
+      - disk_size=100
+    timeout-minutes: 360
+
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup tmate SSH session
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true  # only your GitHub SSH keys can connect
-
-      - name: Show GPU info
-        run: nvidia-smi
-
-      - name: List /dev/
-        run: ls /dev/
-
-      - name: Show CPU info
+      - name: Start Tailscale SSH
+        env:
+          TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
+          HOSTNAME: machine-dev-ssh-${{ github.run_id }}
         run: |
-          echo "Architecture: $(uname -m)"
-          echo "vCPUs: $(nproc)"
-          echo "RAM: $(free -h | awk '/^Mem:/{print $2}')"
+          set -eux
+
+          if [ -z "${TAILSCALE_AUTHKEY:-}" ]; then
+            echo "Missing repo secret: TAILSCALE_AUTHKEY"
+            exit 1
+          fi
+
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends curl ca-certificates openssh-server
+          sudo mkdir -p /run/sshd
+          sudo systemctl start ssh || sudo /usr/sbin/sshd
+
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscaled --state=/tmp/tailscaled.state --socket=/tmp/tailscaled.sock >/tmp/tailscaled.log 2>&1 &
+          sleep 3
+
+          sudo tailscale --socket=/tmp/tailscaled.sock up \
+            --auth-key="${TAILSCALE_AUTHKEY}" \
+            --hostname="${HOSTNAME}" \
+            --ssh=true
+
+          echo
+          echo "SSH ready:"
+          echo "  tailscale ssh runner@${HOSTNAME}"
+          echo
+          echo "GPU check:"
+          nvidia-smi || true
+          ls -la /dev/dri 2>/dev/null || true
+
+      - name: Keep SSH alive
+        run: |
+          minutes='${{ github.event.inputs.keepalive_minutes }}'
+          case "$minutes" in
+            ''|*[!0-9]*) minutes=120 ;;
+          esac
+          if [ "$minutes" -gt 350 ]; then minutes=350; fi
+          echo "Keeping SSH alive for ${minutes} minutes"
+          sleep "$((minutes * 60))"
