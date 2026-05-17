@@ -12,7 +12,7 @@ jobs:
   ssh:
     runs-on:
       - machine
-      - gpu=t4
+      - gpu=t4g
       - regions=eu-south-2
       - tenancy=spot
       - disk_size=100
