@@ -37,8 +37,25 @@ jobs:
           sudo systemctl start ssh || sudo /usr/sbin/sshd
 
           curl -fsSL https://tailscale.com/install.sh | sh
-          sudo tailscaled --state=/tmp/tailscaled.state --socket=/tmp/tailscaled.sock >/tmp/tailscaled.log 2>&1 &
-          sleep 3
+          sudo pkill tailscaled 2>/dev/null || true
+          sudo tailscaled \
+            --tun=userspace-networking \
+            --state=/tmp/tailscaled.state \
+            --socket=/tmp/tailscaled.sock \
+            >/tmp/tailscaled.log 2>&1 &
+
+          for i in $(seq 1 30); do
+            if [ -S /tmp/tailscaled.sock ]; then
+              break
+            fi
+            sleep 1
+          done
+
+          if [ ! -S /tmp/tailscaled.sock ]; then
+            echo "tailscaled did not create /tmp/tailscaled.sock"
+            cat /tmp/tailscaled.log || true
+            exit 1
+          fi
 
           sudo tailscale --socket=/tmp/tailscaled.sock up \
             --auth-key="${TAILSCALE_AUTHKEY}" \
