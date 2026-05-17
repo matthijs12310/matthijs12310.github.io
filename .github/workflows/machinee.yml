@@ -22,6 +22,7 @@ jobs:
       - name: Start Tailscale SSH
         env:
           TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
           HOSTNAME: machine-dev-ssh-${{ github.run_id }}
         run: |
           set -eux
@@ -30,11 +31,32 @@ jobs:
             echo "Missing repo secret: TAILSCALE_AUTHKEY"
             exit 1
           fi
+          if [ -z "${SSH_PUBLIC_KEY:-}" ]; then
+            echo "Missing repo secret: SSH_PUBLIC_KEY"
+            echo "Create one with the contents of your ~/.ssh/id_ed25519.pub"
+            exit 1
+          fi
 
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends curl ca-certificates openssh-server
+
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "${SSH_PUBLIC_KEY}" > "$HOME/.ssh/authorized_keys"
+          chmod 600 "$HOME/.ssh/authorized_keys"
+
+          sudo mkdir -p /root/.ssh
+          sudo chmod 700 /root/.ssh
+          printf '%s\n' "${SSH_PUBLIC_KEY}" | sudo tee /root/.ssh/authorized_keys >/dev/null
+          sudo chmod 600 /root/.ssh/authorized_keys
+
+          sudo sed -i \
+            -e 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication yes/' \
+            -e 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' \
+            -e 's/^#\?PermitRootLogin .*/PermitRootLogin prohibit-password/' \
+            /etc/ssh/sshd_config
           sudo mkdir -p /run/sshd
-          sudo systemctl start ssh || sudo /usr/sbin/sshd
+          sudo systemctl restart ssh || sudo /usr/sbin/sshd
 
           curl -fsSL https://tailscale.com/install.sh | sh
           sudo pkill tailscaled 2>/dev/null || true
@@ -60,11 +82,16 @@ jobs:
           sudo tailscale --socket=/tmp/tailscaled.sock up \
             --auth-key="${TAILSCALE_AUTHKEY}" \
             --hostname="${HOSTNAME}" \
-            --ssh=true
+            --ssh=false
 
           echo
           echo "SSH ready:"
-          echo "  tailscale ssh runner@${HOSTNAME}"
+          echo "  ssh runner@$(sudo tailscale --socket=/tmp/tailscaled.sock ip -4)"
+          echo "  ssh root@$(sudo tailscale --socket=/tmp/tailscaled.sock ip -4)"
+          echo
+          echo "Or by hostname if MagicDNS works:"
+          echo "  ssh runner@${HOSTNAME}"
+          echo "  ssh root@${HOSTNAME}"
           echo
           echo "GPU check:"
           nvidia-smi || true
