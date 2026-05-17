@@ -1,0 +1,20 @@
+name: machine.dev quickstart
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  hello-gpu:
+    runs-on: [machine, gpu=t4g, tenancy=spot]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show GPU info
+        run: nvidia-smi
+
+      - name: Show CPU info
+        run: |
+          echo "Architecture: $(uname -m)"
+          echo "vCPUs: $(nproc)"
+          echo "RAM: $(free -h | awk '/^Mem:/{print $2}')"
