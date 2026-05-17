@@ -3,12 +3,25 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Enable SSH debug session'
+        required: false
+        default: false
 
 jobs:
   hello-gpu:
     runs-on: [machine, gpu=t4g, tenancy=spot]
+    timeout-minutes: 360  # raise this freely for long training runs
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup tmate SSH session
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true  # only your GitHub SSH keys can connect
 
       - name: Show GPU info
         run: nvidia-smi
