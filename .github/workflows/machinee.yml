@@ -12,7 +12,7 @@ jobs:
   ssh:
     runs-on:
       - machine
-      - gpu=t4g
+      - gpu=l4
       - regions=eu-south-2
       - tenancy=spot
       - disk_size=100
@@ -23,7 +23,7 @@ jobs:
         env:
           TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
           SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
-          HOSTNAME: machine-dev-ssh-${{ github.run_id }}
+          HOSTNAME: machine-dev-ssh
         run: |
           set -eux
 
