@@ -12,7 +12,7 @@ jobs:
   ssh:
     runs-on:
       - machine
-      - gpu=l4
+      - gpu=t4
       - regions=eu-south-2
       - tenancy=spot
       - disk_size=100
@@ -23,7 +23,7 @@ jobs:
         env:
           TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
           SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
-          HOSTNAME: machine-dev-ssh
+          HOSTNAME: machine-dev-ssh-${{ github.run_id }}
         run: |
           set -eux
 
@@ -60,34 +60,63 @@ jobs:
 
           curl -fsSL https://tailscale.com/install.sh | sh
           sudo pkill tailscaled 2>/dev/null || true
+          sudo modprobe tun 2>/dev/null || true
+          if [ ! -c /dev/net/tun ]; then
+            sudo mkdir -p /dev/net
+            sudo mknod /dev/net/tun c 10 200 || true
+            sudo chmod 600 /dev/net/tun || true
+          fi
+
+          if [ ! -c /dev/net/tun ]; then
+            echo "ERROR: /dev/net/tun is not available, cannot use normal Tailscale TUN mode"
+            ls -la /dev/net /dev/net/tun 2>/dev/null || true
+            exit 1
+          fi
+
+          sudo mkdir -p /var/lib/tailscale /run/tailscale
           sudo tailscaled \
-            --tun=userspace-networking \
-            --state=/tmp/tailscaled.state \
-            --socket=/tmp/tailscaled.sock \
+            --state=/var/lib/tailscale/tailscaled.state \
+            --socket=/run/tailscale/tailscaled.sock \
             >/tmp/tailscaled.log 2>&1 &
 
           for i in $(seq 1 30); do
-            if [ -S /tmp/tailscaled.sock ]; then
+            if [ -S /run/tailscale/tailscaled.sock ]; then
               break
             fi
             sleep 1
           done
 
-          if [ ! -S /tmp/tailscaled.sock ]; then
-            echo "tailscaled did not create /tmp/tailscaled.sock"
+          if [ ! -S /run/tailscale/tailscaled.sock ]; then
+            echo "ERROR: tailscaled did not create /run/tailscale/tailscaled.sock"
+            ps aux | grep '[t]ailscaled' || true
+            ls -la /run/tailscale /var/lib/tailscale /dev/net /dev/net/tun 2>/dev/null || true
             cat /tmp/tailscaled.log || true
             exit 1
           fi
 
-          sudo tailscale --socket=/tmp/tailscaled.sock up \
+          if ! sudo tailscale --socket=/run/tailscale/tailscaled.sock up \
             --auth-key="${TAILSCALE_AUTHKEY}" \
             --hostname="${HOSTNAME}" \
-            --ssh=false
+            --ssh=false; then
+            echo "ERROR: tailscale up failed"
+            sudo tailscale --socket=/run/tailscale/tailscaled.sock status || true
+            ip addr || true
+            cat /tmp/tailscaled.log || true
+            exit 1
+          fi
+
+          if ! ip link show tailscale0 >/dev/null 2>&1; then
+            echo "ERROR: tailscale0 was not created after tailscale up"
+            sudo tailscale --socket=/run/tailscale/tailscaled.sock status || true
+            ip addr || true
+            cat /tmp/tailscaled.log || true
+            exit 1
+          fi
 
           echo
           echo "SSH ready:"
-          echo "  ssh runner@$(sudo tailscale --socket=/tmp/tailscaled.sock ip -4)"
-          echo "  ssh root@$(sudo tailscale --socket=/tmp/tailscaled.sock ip -4)"
+          echo "  ssh runner@$(sudo tailscale --socket=/run/tailscale/tailscaled.sock ip -4)"
+          echo "  ssh root@$(sudo tailscale --socket=/run/tailscale/tailscaled.sock ip -4)"
           echo
           echo "Or by hostname if MagicDNS works:"
           echo "  ssh runner@${HOSTNAME}"
