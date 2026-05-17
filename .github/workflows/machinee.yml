@@ -14,7 +14,7 @@ jobs:
       - machine
       - gpu=l4
       - regions=eu-south-2
-      - tenancy=spot
+      - tenancy=on_demand
       - disk_size=100
     timeout-minutes: 360
 
@@ -23,7 +23,7 @@ jobs:
         env:
           TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
           SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
-          HOSTNAME: machine-dev-ssh-${{ github.run_id }}
+          HOSTNAME: machine-dev-l4-eu
         run: |
           set -eux
 
