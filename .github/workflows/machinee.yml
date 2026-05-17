@@ -14,7 +14,7 @@ jobs:
       - machine
       - gpu=l4
       - regions=eu-south-2
-      - tenancy=on_demand
+      - tenancy=spot
       - disk_size=100
     timeout-minutes: 360
 
