@@ -99,6 +99,18 @@ jobs:
           sudo mkdir -p /run/sshd
           sudo systemctl restart ssh || sudo /usr/sbin/sshd
 
+
+      - name: Copy machine-dev repo to home
+        run: |
+          sudo cp -r /tmp/machine-dev-repo /root/machine-dev
+          echo "Repo available at /root/machine-dev"
+          echo "=== /root/machine-dev contents ==="
+          sudo find /root/machine-dev -maxdepth 3 -ls
+          echo "=== looking for .sh files ==="
+          sudo find /root/machine-dev -name "*.sh"
+          echo "=== looking for .py files ==="
+          sudo find /root/machine-dev -name "*.py"
+
       - name: Restore Sunshine pairing state
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
