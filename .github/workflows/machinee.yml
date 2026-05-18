@@ -123,6 +123,9 @@ jobs:
         run: |
           sudo cp -r /tmp/machine-dev-repo /root/machine-dev
           echo "Repo available at /root/machine-dev"
+          sudo chmod +x /root/machine-dev/machine-dev-repo/*.sh
+          sudo chmod 755 /root/machine-dev/machine-dev-repo
+          sudo chmod +x /root/machine-dev/machine-dev-repo/moonlight-input-bridge.py
 
       - name: Print connection info
         run: |
