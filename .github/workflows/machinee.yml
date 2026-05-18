@@ -123,14 +123,6 @@ jobs:
           sudo chmod 600 /root/.config/sunshine/credentials/cakey.pem
           echo "Sunshine pairing state restored"
 
-      - name: Copy machine-dev repo to home
-        run: |
-          sudo cp -r /tmp/machine-dev-repo /root/machine-dev
-          echo "Repo available at /root/machine-dev"
-          sudo chmod +x /root/machine-dev/*.sh
-          sudo chmod 755 /root/machine-dev
-          sudo chmod +x /root/machine-dev/moonlight-input-bridge.py
-
       - name: Print connection info
         run: |
           set -euo pipefail
