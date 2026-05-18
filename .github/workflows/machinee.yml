@@ -19,26 +19,42 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Start Tailscale SSH
+      - name: Remove stale Tailscale node
         env:
-          TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
-          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
-          HOSTNAME: machine-dev-l4-eu
+          TS_OAUTH_CLIENT_ID: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          TS_OAUTH_SECRET: ${{ secrets.TS_OAUTH_SECRET }}
         run: |
-          set -eux
+          set -euo pipefail
+          sudo apt-get install -y --no-install-recommends curl jq ca-certificates
 
-          if [ -z "${TAILSCALE_AUTHKEY:-}" ]; then
-            echo "Missing repo secret: TAILSCALE_AUTHKEY"
-            exit 1
-          fi
-          if [ -z "${SSH_PUBLIC_KEY:-}" ]; then
-            echo "Missing repo secret: SSH_PUBLIC_KEY"
-            echo "Create one with the contents of your ~/.ssh/id_ed25519.pub"
-            exit 1
+          token=$(curl -sf -X POST "https://api.tailscale.com/api/v2/oauth/token" \
+            -d "client_id=${TS_OAUTH_CLIENT_ID}&client_secret=${TS_OAUTH_SECRET}&grant_type=client_credentials" \
+            | jq -r '.access_token')
+
+          stale_ids=$(
+            curl -sf -H "Authorization: Bearer ${token}" \
+              "https://api.tailscale.com/api/v2/tailnet/TLThkP2zd811CNTRL/devices" \
+            | jq -r '.devices[] | select(.hostname == "machine-dev-l4-eu") | .id'
+          )
+
+          if [ -z "$stale_ids" ]; then
+            echo "No stale node found, continuing"
+          else
+            echo "$stale_ids" | while read -r id; do
+              echo "Deleting stale node: $id"
+              curl -sf -X DELETE -H "Authorization: Bearer ${token}" \
+                "https://api.tailscale.com/api/v2/device/${id}"
+            done
+            echo "Deleted, waiting for propagation"
+            sleep 5
           fi
 
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends curl ca-certificates openssh-server lsof iproute2 kmod
+      - name: Setup SSH
+        env:
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y --no-install-recommends openssh-server
 
           mkdir -p "$HOME/.ssh"
           chmod 700 "$HOME/.ssh"
@@ -58,83 +74,33 @@ jobs:
           sudo mkdir -p /run/sshd
           sudo systemctl restart ssh || sudo /usr/sbin/sshd
 
-          curl -fsSL https://tailscale.com/install.sh | sh
-          sudo systemctl stop tailscaled 2>/dev/null || true
-          sudo pkill -9 tailscaled 2>/dev/null || true
-          sudo lsof -n /dev/net/tun || true
-          sudo ip link delete tailscale0 2>/dev/null || true
-          sudo modprobe tun 2>/dev/null || true
-          if [ ! -c /dev/net/tun ]; then
-            sudo mkdir -p /dev/net
-            sudo mknod /dev/net/tun c 10 200 || true
-            sudo chmod 600 /dev/net/tun || true
-          fi
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          hostname: machine-dev-l4-eu
+          args: --advertise-tags=tag:ci --ssh=false --accept-routes --ephemeral
 
-          if [ ! -c /dev/net/tun ]; then
-            echo "ERROR: /dev/net/tun is not available, cannot use normal Tailscale TUN mode"
-            ls -la /dev/net /dev/net/tun 2>/dev/null || true
-            exit 1
-          fi
-
-          sudo mkdir -p /var/lib/tailscale /run/tailscale
-          sudo tailscaled \
-            --state=/var/lib/tailscale/tailscaled.state \
-            --socket=/run/tailscale/tailscaled.sock \
-            >/tmp/tailscaled.log 2>&1 &
-
-          for i in $(seq 1 30); do
-            if [ -S /run/tailscale/tailscaled.sock ]; then
-              break
-            fi
-            sleep 1
-          done
-
-          if [ ! -S /run/tailscale/tailscaled.sock ]; then
-            echo "ERROR: tailscaled did not create /run/tailscale/tailscaled.sock"
-            ps aux | grep '[t]ailscaled' || true
-            ls -la /run/tailscale /var/lib/tailscale /dev/net /dev/net/tun 2>/dev/null || true
-            cat /tmp/tailscaled.log || true
-            exit 1
-          fi
-
-          if ! sudo tailscale --socket=/run/tailscale/tailscaled.sock up \
-            --auth-key="${TAILSCALE_AUTHKEY}" \
-            --hostname="${HOSTNAME}" \
-            --ssh=false; then
-            echo "ERROR: tailscale up failed"
-            sudo tailscale --socket=/run/tailscale/tailscaled.sock status || true
-            ip addr || true
-            cat /tmp/tailscaled.log || true
-            exit 1
-          fi
-
-          if ! ip link show tailscale0 >/dev/null 2>&1; then
-            echo "ERROR: tailscale0 was not created after tailscale up"
-            sudo tailscale --socket=/run/tailscale/tailscaled.sock status || true
-            ip addr || true
-            cat /tmp/tailscaled.log || true
-            exit 1
-          fi
-
+      - name: Print connection info
+        run: |
+          set -euo pipefail
+          ipv4=$(tailscale ip -4)
           echo
           echo "SSH ready:"
-          echo "  ssh runner@$(sudo tailscale --socket=/run/tailscale/tailscaled.sock ip -4)"
-          echo "  ssh root@$(sudo tailscale --socket=/run/tailscale/tailscaled.sock ip -4)"
+          echo "  ssh runner@${ipv4}"
+          echo "  ssh root@${ipv4}"
           echo
-          echo "Or by hostname if MagicDNS works:"
-          echo "  ssh runner@${HOSTNAME}"
-          echo "  ssh root@${HOSTNAME}"
+          echo "Or by MagicDNS:"
+          echo "  ssh runner@machine-dev-l4-eu"
+          echo "  ssh root@machine-dev-l4-eu"
           echo
-          echo "GPU check:"
           nvidia-smi || true
-          ls -la /dev/dri 2>/dev/null || true
 
       - name: Keep SSH alive
         run: |
           minutes='${{ github.event.inputs.keepalive_minutes }}'
-          case "$minutes" in
-            ''|*[!0-9]*) minutes=120 ;;
-          esac
-          if [ "$minutes" -gt 350 ]; then minutes=350; fi
-          echo "Keeping SSH alive for ${minutes} minutes"
+          case "$minutes" in ''|*[!0-9]*) minutes=120 ;; esac
+          [ "$minutes" -gt 350 ] && minutes=350
+          echo "Keeping alive for ${minutes} minutes"
           sleep "$((minutes * 60))"
