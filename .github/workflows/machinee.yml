@@ -110,16 +110,9 @@ jobs:
             /tmp/machine-dev-repo
           sudo cp -r /tmp/machine-dev-repo /root/machine-dev
           echo "Repo available at /root/machine-dev"
-          echo "=== /root/machine-dev contents ==="
-          sudo find /root/machine-dev -maxdepth 3 -ls
-          echo "=== looking for .sh files ==="
-          sudo find /root/machine-dev -name "*.sh"
-          echo "=== looking for .py files ==="
-          sudo find /root/machine-dev -name "*.py"
-          sudo ls /tmp/machine-dev-repo
-          sudo chmod +x /root/machine-dev/*.sh
-          sudo chmod +x /root/machine-dev/moonlight-input-bridge.py
           sudo chmod 755 /root/machine-dev
+          sudo bash -c 'chmod +x /root/machine-dev/*.sh'
+          sudo bash -c 'chmod +x /root/machine-dev/moonlight-input-bridge.py'
           sudo mkdir -p /root/.config/sunshine/credentials
           sudo cp /tmp/machine-dev-repo/sunshine/sunshine_state.json \
             /root/.config/sunshine/sunshine_state.json
