@@ -96,8 +96,7 @@ jobs:
             --hostname=machine-dev-l4-eu \
             --advertise-tags=tag:ci \
             --ssh=false \
-            --accept-routes \
-            --ephemeral
+            --accept-routes
 
       - name: Print connection info
         run: |
