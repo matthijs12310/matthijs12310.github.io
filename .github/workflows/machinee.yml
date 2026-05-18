@@ -11,7 +11,7 @@ jobs:
     runs-on:
       - machine
       - gpu=l4
-      - cpu=8
+      - cpu=16
       - regions=eu-south-2
       - tenancy=spot
       - disk_size=100
