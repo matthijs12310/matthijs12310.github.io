@@ -100,28 +100,28 @@ jobs:
           sudo systemctl restart ssh || sudo /usr/sbin/sshd
 
 
-      # - name: Restore Sunshine pairing state
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     set -euo pipefail
-      #     git clone --depth=1 \
-      #       "https://x-access-token:${GITHUB_TOKEN}@github.com/matthijs12310/machine-dev.git" \
-      #       /tmp/machine-dev-repo
-      #     sudo cp -r /tmp/machine-dev-repo /root/machine-dev
-      #     echo "Repo available at /root/machine-dev"
-      #     sudo chmod 755 /root/machine-dev
-      #     sudo bash -c 'chmod +x /root/machine-dev/*.sh'
-      #     sudo bash -c 'chmod +x /root/machine-dev/moonlight-input-bridge.py'
-      #     sudo mkdir -p /root/.config/sunshine/credentials
-      #     sudo cp /tmp/machine-dev-repo/sunshine/sunshine_state.json \
-      #       /root/.config/sunshine/sunshine_state.json
-      #     sudo cp /tmp/machine-dev-repo/sunshine/cacert.pem \
-      #       /root/.config/sunshine/credentials/cacert.pem
-      #     sudo cp /tmp/machine-dev-repo/sunshine/cakey.pem \
-      #       /root/.config/sunshine/credentials/cakey.pem
-      #     sudo chmod 600 /root/.config/sunshine/credentials/cakey.pem
-      #     echo "Sunshine pairing state restored"
+      - name: Restore Sunshine pairing state
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --depth=1 \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/matthijs12310/machine-dev.git" \
+            /tmp/machine-dev-repo
+          sudo cp -r /tmp/machine-dev-repo /root/machine-dev
+          echo "Repo available at /root/machine-dev"
+          sudo chmod 755 /root/machine-dev
+          sudo bash -c 'chmod +x /root/machine-dev/*.sh'
+          sudo bash -c 'chmod +x /root/machine-dev/moonlight-input-bridge.py'
+          sudo mkdir -p /root/.config/sunshine/credentials
+          sudo cp /tmp/machine-dev-repo/sunshine/sunshine_state.json \
+            /root/.config/sunshine/sunshine_state.json
+          sudo cp /tmp/machine-dev-repo/sunshine/cacert.pem \
+            /root/.config/sunshine/credentials/cacert.pem
+          sudo cp /tmp/machine-dev-repo/sunshine/cakey.pem \
+            /root/.config/sunshine/credentials/cakey.pem
+          sudo chmod 600 /root/.config/sunshine/credentials/cakey.pem
+          echo "Sunshine pairing state restored"
 
       - name: Print connection info
         run: |
