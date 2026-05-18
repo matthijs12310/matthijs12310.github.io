@@ -78,7 +78,7 @@ jobs:
         uses: tailscale/github-action@v3
         with:
           oauth-client-id: ${{ secrets.OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.OAUTH_CLIENT_SECRET }}
+          oauth-client-secret: ${{ secrets.OAUTH_CLIENT_SECRET }}
           hostname: machine-dev-l4-eu
           args: --advertise-tags=tag:ci --ssh=false --accept-routes --ephemeral
 
