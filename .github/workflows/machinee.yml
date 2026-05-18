@@ -16,41 +16,19 @@ jobs:
       - disk_size=100
     timeout-minutes: 360
     steps:
-      - name: Setup SSH
-        env:
-          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends curl jq ca-certificates openssh-server
-          mkdir -p "$HOME/.ssh"
-          chmod 700 "$HOME/.ssh"
-          printf '%s\n' "${SSH_PUBLIC_KEY}" > "$HOME/.ssh/authorized_keys"
-          chmod 600 "$HOME/.ssh/authorized_keys"
-          sudo mkdir -p /root/.ssh
-          sudo chmod 700 /root/.ssh
-          printf '%s\n' "${SSH_PUBLIC_KEY}" | sudo tee /root/.ssh/authorized_keys >/dev/null
-          sudo chmod 600 /root/.ssh/authorized_keys
-          sudo sed -i \
-            -e 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication yes/' \
-            -e 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' \
-            -e 's/^#\?PermitRootLogin .*/PermitRootLogin prohibit-password/' \
-            /etc/ssh/sshd_config
-          sudo mkdir -p /run/sshd
-          sudo systemctl restart ssh || sudo /usr/sbin/sshd
-
       - name: Install and connect Tailscale
         env:
           OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
           OAUTH_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
         run: |
           set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends curl jq ca-certificates
 
           token=$(curl -sf -X POST "https://api.tailscale.com/api/v2/oauth/token" \
             -d "client_id=${OAUTH_CLIENT_ID}&client_secret=${OAUTH_CLIENT_SECRET}&grant_type=client_credentials" \
             | jq -r '.access_token')
 
-          # Remove stale node
           stale_ids=$(
             curl -sf -H "Authorization: Bearer ${token}" \
               "https://api.tailscale.com/api/v2/tailnet/-/devices" \
@@ -68,7 +46,6 @@ jobs:
             sleep 5
           fi
 
-          # Generate a short-lived ephemeral auth key
           authkey=$(curl -sf -X POST \
             -H "Authorization: Bearer ${token}" \
             -H "Content-Type: application/json" \
@@ -86,7 +63,6 @@ jobs:
               }
             }' | jq -r '.key')
 
-          # Install and start Tailscale
           curl -fsSL https://tailscale.com/install.sh | sh
           sudo tailscaled --state=/tmp/tailscaled.state >/tmp/tailscaled.log 2>&1 &
           sleep 3
@@ -97,6 +73,52 @@ jobs:
             --advertise-tags=tag:ci \
             --ssh=false \
             --accept-routes
+
+      - name: Setup SSH
+        env:
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y --no-install-recommends openssh-server
+
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "${SSH_PUBLIC_KEY}" > "$HOME/.ssh/authorized_keys"
+          chmod 600 "$HOME/.ssh/authorized_keys"
+
+          sudo mkdir -p /root/.ssh
+          sudo chmod 700 /root/.ssh
+          printf '%s\n' "${SSH_PUBLIC_KEY}" | sudo tee /root/.ssh/authorized_keys >/dev/null
+          sudo chmod 600 /root/.ssh/authorized_keys
+
+          sudo sed -i \
+            -e 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication yes/' \
+            -e 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' \
+            -e 's/^#\?PermitRootLogin .*/PermitRootLogin prohibit-password/' \
+            /etc/ssh/sshd_config
+          sudo mkdir -p /run/sshd
+          sudo systemctl restart ssh || sudo /usr/sbin/sshd
+
+      - name: Restore Sunshine pairing state
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --depth=1 \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/matthijs12310/machine-dev.git" \
+            /tmp/machine-dev-repo
+
+          mkdir -p '/root/machine-dev/$HOME/.config/sunshine/credentials'
+          cp /tmp/machine-dev-repo/sunshine/sunshine_state.json \
+            '/root/machine-dev/$HOME/.config/sunshine/sunshine_state.json'
+          cp /tmp/machine-dev-repo/sunshine/cacert.pem \
+            '/root/machine-dev/$HOME/.config/sunshine/credentials/cacert.pem'
+          cp /tmp/machine-dev-repo/sunshine/cakey.pem \
+            '/root/machine-dev/$HOME/.config/sunshine/credentials/cakey.pem'
+          chmod 600 '/root/machine-dev/$HOME/.config/sunshine/credentials/cakey.pem'
+
+          rm -rf /tmp/machine-dev-repo
+          echo "Sunshine pairing state restored"
 
       - name: Print connection info
         run: |
