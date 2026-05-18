@@ -116,9 +116,13 @@ jobs:
           sudo cp /tmp/machine-dev-repo/sunshine/cakey.pem \
             '/root/machine-dev/$HOME/.config/sunshine/credentials/cakey.pem'
           sudo chmod 600 '/root/machine-dev/$HOME/.config/sunshine/credentials/cakey.pem'
-
-          rm -rf /tmp/machine-dev-repo
+          
           echo "Sunshine pairing state restored"
+
+      - name: Copy machine-dev repo to home
+        run: |
+          sudo cp -r /tmp/machine-dev-repo /root/machine-dev
+          echo "Repo available at /root/machine-dev"
 
       - name: Print connection info
         run: |
