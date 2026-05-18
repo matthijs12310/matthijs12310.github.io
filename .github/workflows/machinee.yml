@@ -1,5 +1,4 @@
 name: machine.dev SSH shell
-
 on:
   workflow_dispatch:
     inputs:
@@ -7,7 +6,6 @@ on:
         description: "How long to keep the runner alive"
         required: true
         default: "120"
-
 jobs:
   ssh:
     runs-on:
@@ -17,27 +15,47 @@ jobs:
       - tenancy=spot
       - disk_size=100
     timeout-minutes: 360
-
     steps:
-      - name: Remove stale Tailscale node
+      - name: Setup SSH
+        env:
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends curl jq ca-certificates openssh-server
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "${SSH_PUBLIC_KEY}" > "$HOME/.ssh/authorized_keys"
+          chmod 600 "$HOME/.ssh/authorized_keys"
+          sudo mkdir -p /root/.ssh
+          sudo chmod 700 /root/.ssh
+          printf '%s\n' "${SSH_PUBLIC_KEY}" | sudo tee /root/.ssh/authorized_keys >/dev/null
+          sudo chmod 600 /root/.ssh/authorized_keys
+          sudo sed -i \
+            -e 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication yes/' \
+            -e 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' \
+            -e 's/^#\?PermitRootLogin .*/PermitRootLogin prohibit-password/' \
+            /etc/ssh/sshd_config
+          sudo mkdir -p /run/sshd
+          sudo systemctl restart ssh || sudo /usr/sbin/sshd
+
+      - name: Install and connect Tailscale
         env:
           OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
           OAUTH_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
         run: |
           set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends curl jq ca-certificates
 
           token=$(curl -sf -X POST "https://api.tailscale.com/api/v2/oauth/token" \
             -d "client_id=${OAUTH_CLIENT_ID}&client_secret=${OAUTH_CLIENT_SECRET}&grant_type=client_credentials" \
             | jq -r '.access_token')
 
+          # Remove stale node
           stale_ids=$(
             curl -sf -H "Authorization: Bearer ${token}" \
-              "https://api.tailscale.com/api/v2/tailnet/TLThkP2zd811CNTRL/devices" \
+              "https://api.tailscale.com/api/v2/tailnet/-/devices" \
             | jq -r '.devices[] | select(.hostname == "machine-dev-l4-eu") | .id'
           )
-
           if [ -z "$stale_ids" ]; then
             echo "No stale node found, continuing"
           else
@@ -50,46 +68,41 @@ jobs:
             sleep 5
           fi
 
-      - name: Setup SSH
-        env:
-          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends openssh-server
+          # Generate a short-lived ephemeral auth key
+          authkey=$(curl -sf -X POST \
+            -H "Authorization: Bearer ${token}" \
+            -H "Content-Type: application/json" \
+            "https://api.tailscale.com/api/v2/tailnet/-/keys" \
+            -d '{
+              "capabilities": {
+                "devices": {
+                  "create": {
+                    "reusable": false,
+                    "ephemeral": true,
+                    "preauthorized": true,
+                    "tags": ["tag:ci"]
+                  }
+                }
+              }
+            }' | jq -r '.key')
 
-          mkdir -p "$HOME/.ssh"
-          chmod 700 "$HOME/.ssh"
-          printf '%s\n' "${SSH_PUBLIC_KEY}" > "$HOME/.ssh/authorized_keys"
-          chmod 600 "$HOME/.ssh/authorized_keys"
+          # Install and start Tailscale
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscaled --state=/tmp/tailscaled.state >/tmp/tailscaled.log 2>&1 &
+          sleep 3
 
-          sudo mkdir -p /root/.ssh
-          sudo chmod 700 /root/.ssh
-          printf '%s\n' "${SSH_PUBLIC_KEY}" | sudo tee /root/.ssh/authorized_keys >/dev/null
-          sudo chmod 600 /root/.ssh/authorized_keys
-
-          sudo sed -i \
-            -e 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication yes/' \
-            -e 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' \
-            -e 's/^#\?PermitRootLogin .*/PermitRootLogin prohibit-password/' \
-            /etc/ssh/sshd_config
-
-          sudo mkdir -p /run/sshd
-          sudo systemctl restart ssh || sudo /usr/sbin/sshd
-
-      - name: Connect to Tailscale
-        uses: tailscale/github-action@v3
-        with:
-          oauth-client-id: ${{ secrets.OAUTH_CLIENT_ID }}
-          oauth-client-secret: ${{ secrets.OAUTH_CLIENT_SECRET }}
-          hostname: machine-dev-l4-eu
-          args: --advertise-tags=tag:ci --ssh=false --accept-routes --ephemeral
+          sudo tailscale up \
+            --authkey="${authkey}" \
+            --hostname=machine-dev-l4-eu \
+            --advertise-tags=tag:ci \
+            --ssh=false \
+            --accept-routes \
+            --ephemeral
 
       - name: Print connection info
         run: |
           set -euo pipefail
           ipv4=$(tailscale ip -4 || true)
-
           echo ""
           echo "SSH ready:"
           echo "  ssh runner@${ipv4}"
@@ -99,16 +112,13 @@ jobs:
           echo "  ssh runner@machine-dev-l4-eu"
           echo "  ssh root@machine-dev-l4-eu"
           echo ""
-
           nvidia-smi || true
 
       - name: Keep SSH alive
         run: |
           set -euo pipefail
-
           minutes='${{ github.event.inputs.keepalive_minutes }}'
           case "$minutes" in ''|*[!0-9]*) minutes=120 ;; esac
           [ "$minutes" -gt 350 ] && minutes=350
-
           echo "Keeping alive for ${minutes} minutes"
           sleep "$((minutes * 60))"
