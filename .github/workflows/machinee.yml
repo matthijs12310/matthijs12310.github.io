@@ -25,6 +25,7 @@ jobs:
           OAUTH_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
         run: |
           set -euo pipefail
+          sudo apt-get update
           sudo apt-get install -y --no-install-recommends curl jq ca-certificates
 
           token=$(curl -sf -X POST "https://api.tailscale.com/api/v2/oauth/token" \
@@ -54,6 +55,7 @@ jobs:
           SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
         run: |
           set -euo pipefail
+          sudo apt-get update
           sudo apt-get install -y --no-install-recommends openssh-server
 
           mkdir -p "$HOME/.ssh"
@@ -71,6 +73,7 @@ jobs:
             -e 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' \
             -e 's/^#\?PermitRootLogin .*/PermitRootLogin prohibit-password/' \
             /etc/ssh/sshd_config
+
           sudo mkdir -p /run/sshd
           sudo systemctl restart ssh || sudo /usr/sbin/sshd
 
@@ -85,22 +88,27 @@ jobs:
       - name: Print connection info
         run: |
           set -euo pipefail
-          ipv4=$(tailscale ip -4)
-          echo
+          ipv4=$(tailscale ip -4 || true)
+
+          echo ""
           echo "SSH ready:"
           echo "  ssh runner@${ipv4}"
           echo "  ssh root@${ipv4}"
-          echo
+          echo ""
           echo "Or by MagicDNS:"
           echo "  ssh runner@machine-dev-l4-eu"
           echo "  ssh root@machine-dev-l4-eu"
-          echo
+          echo ""
+
           nvidia-smi || true
 
       - name: Keep SSH alive
         run: |
+          set -euo pipefail
+
           minutes='${{ github.event.inputs.keepalive_minutes }}'
           case "$minutes" in ''|*[!0-9]*) minutes=120 ;; esac
           [ "$minutes" -gt 350 ] && minutes=350
+
           echo "Keeping alive for ${minutes} minutes"
           sleep "$((minutes * 60))"
