@@ -108,15 +108,14 @@ jobs:
             "https://x-access-token:${GITHUB_TOKEN}@github.com/matthijs12310/machine-dev.git" \
             /tmp/machine-dev-repo
 
-          sudo mkdir -p '/root/machine-dev/$HOME/.config/sunshine/credentials'
+          sudo mkdir -p /root/.config/sunshine/credentials
           sudo cp /tmp/machine-dev-repo/sunshine/sunshine_state.json \
-            '/root/machine-dev/$HOME/.config/sunshine/sunshine_state.json'
+            /root/.config/sunshine/sunshine_state.json
           sudo cp /tmp/machine-dev-repo/sunshine/cacert.pem \
-            '/root/machine-dev/$HOME/.config/sunshine/credentials/cacert.pem'
+            /root/.config/sunshine/credentials/cacert.pem
           sudo cp /tmp/machine-dev-repo/sunshine/cakey.pem \
-            '/root/machine-dev/$HOME/.config/sunshine/credentials/cakey.pem'
-          sudo chmod 600 '/root/machine-dev/$HOME/.config/sunshine/credentials/cakey.pem'
-          
+            /root/.config/sunshine/credentials/cakey.pem
+          sudo chmod 600 /root/.config/sunshine/credentials/cakey.pem
           echo "Sunshine pairing state restored"
 
       - name: Copy machine-dev repo to home
