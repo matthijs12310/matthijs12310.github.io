@@ -220,4 +220,4 @@ cd /opt/container-services/steam-headless
 sudo docker-compose up -d --force-recreate
 
 
-# ssh -L 47990:127.0.0.1:47990 matt@
+echo ssh -L 47990:127.0.0.1:47990 matt@
